@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeVisio - Focus & Perception</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        neon: '#0ff',
+                        darkbg: '#0a0a0f',
+                        panel: '#151520'
+                    },
+                    fontFamily: {
+                        mono: ['"Courier New"', 'Courier', 'monospace'],
+                        sans: ['"Inter"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0a0a0f; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .cyber-border { border: 1px solid rgba(0, 255, 255, 0.3); box-shadow: 0 0 10px rgba(0, 255, 255, 0.1); }
+        .cyber-glow { text-shadow: 0 0 8px rgba(0, 255, 255, 0.6); }
+        .tab-active { border-bottom: 2px solid #0ff; color: #0ff; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0f; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0ff; }
+
+        /* Blink Animation */
+        @keyframes pulse-drop {
+            0%, 100% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); text-shadow: 0 0 15px #0ff; }
+        }
+        .blink-warning { animation: pulse-drop 1.5s ease-in-out infinite; }
+        
+        /* Slider */
+        input[type=range] { accent-color: #0ff; }
+    </style>
+</head>
+<body class="h-screen flex flex-col items-center p-6 selection:bg-neon selection:text-black">
+
+    <!-- Header & Navigation -->
+    <header class="w-full max-w-4xl flex justify-between items-end mb-8 border-b border-gray-800 pb-4">
+        <div>
+            <h1 class="text-4xl font-mono font-bold text-neon cyber-glow tracking-tighter">VibeVisio</h1>
+            <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest">Algısal Öğrenme & Göz Odak Sistemi</p>
+        </div>
+        <nav class="flex gap-6 font-mono text-sm">
+            <button onclick="switchTab('gabor')" id="tab-gabor" class="pb-1 hover:text-neon tab-active">Gabor Patch</button>
+            <button onclick="switchTab('notebook')" id="tab-notebook" class="pb-1 hover:text-neon">Defter</button>
+            <button onclick="switchTab('focus')" id="tab-focus" class="pb-1 hover:text-neon">Active Focus</button>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="w-full max-w-4xl flex-1 relative">
+        
+        <!-- MODULE 1: Gabor Patch -->
+        <section id="mod-gabor" class="absolute inset-0 flex flex-col items-center justify-center">
+            <div class="flex flex-col items-center w-full max-w-md cyber-border bg-panel p-8 rounded-lg relative">
+                <div id="blink-alert" class="absolute top-4 right-4 text-2xl hidden blink-warning">💧 Göz Kırp!</div>
+                
+                <h2 class="text-xl font-mono text-neon mb-4">Reaksiyon Egzersizi</h2>
+                <p class="text-xs text-gray-400 text-center mb-6">Ortada beliren çizgilerin yönünü tahmin et.<br><span class="text-white bg-gray-800 px-2 py-1 rounded">1 = Sola ( \ )</span> | <span class="text-white bg-gray-800 px-2 py-1 rounded">2 = Sağa ( / )</span></p>
+                
+                <canvas id="gabor-canvas" width="150" height="150" class="bg-black rounded-lg border border-gray-700 mb-6"></canvas>
+                
+                <div class="flex gap-4 w-full">
+                    <div class="flex-1 bg-gray-900 p-3 rounded text-center">
+                        <div class="text-xs text-gray-500">Reaksiyon</div>
+                        <div id="reaction-time" class="text-lg font-mono text-neon">-- ms</div>
+                    </div>
+                    <div class="flex-1 bg-gray-900 p-3 rounded text-center">
+                        <div class="text-xs text-gray-500">Skor</div>
+                        <div id="gabor-score" class="text-lg font-mono text-green-400">0 / 0</div>
+                    </div>
+                </div>
+
+                <button id="btn-gabor-start" onclick="toggleGabor()" class="mt-6 w-full bg-neon text-black font-bold py-2 rounded hover:bg-cyan-300 transition-colors">Egzersizi Başlat</button>
+            </div>
+        </section>
+
+        <!-- MODULE 2: Notebook (Defter Paneli) -->
+        <section id="mod-notebook" class="absolute inset-0 hidden flex-col">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+                <div class="cyber-border bg-panel p-6 rounded-lg flex flex-col">
+                    <h2 class="text-lg font-mono text-neon mb-2">Yeni Kayıt Girişi</h2>
+                    <p class="text-xs text-gray-400 mb-4">Format: <span class="text-white">YabancıKelime - TürkçeKarşılığı</span> (Her satıra bir tane)</p>
+                    <textarea id="notebook-input" class="w-full flex-1 bg-gray-900 text-sm text-gray-200 p-4 rounded border border-gray-700 focus:border-neon outline-none resize-none font-mono" placeholder="örn:&#10;Resilience - Psikolojik Sağlamlık&#10;Perception - Algı"></textarea>
+                    <button onclick="saveNotebook()" class="mt-4 bg-gray-800 hover:bg-gray-700 text-neon border border-gray-700 py-2 rounded transition-colors w-full font-mono">Deftere Ekle / Kaydet</button>
+                </div>
+                <div class="cyber-border bg-panel p-6 rounded-lg flex flex-col h-full">
+                    <h2 class="text-lg font-mono text-neon mb-4">Kayıtlı Defter İçeriği (<span id="word-count">0</span>)</h2>
+                    <div id="notebook-list" class="flex-1 overflow-y-auto space-y-2 pr-2">
+                        <!-- Items will be injected here -->
+                    </div>
+                    <button onclick="clearNotebook()" class="mt-4 bg-red-900/30 hover:bg-red-900/60 text-red-400 border border-red-900 py-2 rounded transition-colors w-full text-xs font-mono">Tüm Defteri Temizle</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 3 & 4: Active Focus & Mini Quiz -->
+        <section id="mod-focus" class="absolute inset-0 hidden flex-col items-center justify-center">
+            
+            <!-- Focus Setup / Intro -->
+            <div id="focus-setup" class="cyber-border bg-panel p-8 rounded-lg text-center max-w-md w-full">
+                <h2 class="text-2xl font-mono text-neon mb-2">Active Focus Modu</h2>
+                <p class="text-sm text-gray-400 mb-6">Defterdeki kelimeler loş ortamda sırayla gösterilir. Kontrastı gözünün odaklanma sınırına göre ayarla.</p>
+                <div class="text-left mb-6">
+                    <label class="text-xs text-gray-500 mb-1 block">Metin Kontrastı (Zorluk)</label>
+                    <input type="range" id="contrast-slider" min="10" max="100" value="40" class="w-full">
+                </div>
+                <button onclick="startFocusMode()" class="w-full bg-neon text-black font-bold py-2 rounded hover:bg-cyan-300 transition-colors">Odaklanmaya Başla (Space)</button>
+            </div>
+
+            <!-- Focus Player -->
+            <div id="focus-player" class="hidden flex-col items-center justify-center w-full h-full">
+                <div id="focus-emoji" class="text-4xl mb-4 opacity-50">⚡</div>
+                <div id="focus-foreign" class="text-5xl md:text-7xl font-bold tracking-wider mb-6 transition-colors duration-300 text-center" style="color: #666;">Word</div>
+                <div id="focus-turkish" class="text-2xl md:text-3xl text-neon cyber-glow opacity-0 transition-opacity duration-300 h-10 text-center">Kelime</div>
+                
+                <div class="absolute bottom-10 text-gray-600 font-mono text-sm tracking-widest text-center">
+                    [ SPACE ] : Çeviriyi Gör / İleri <br>
+                    <span id="focus-progress" class="text-xs">1 / 10</span>
+                </div>
+            </div>
+
+            <!-- Quiz Modu -->
+            <div id="quiz-player" class="hidden cyber-border bg-panel p-8 rounded-lg w-full max-w-lg">
+                <h2 class="text-xl font-mono text-neon mb-1 cyber-glow text-center">Mini Quiz</h2>
+                <p class="text-xs text-gray-500 text-center mb-8">Karşılığı seçerek hafızanı test et</p>
+                
+                <div id="quiz-question" class="text-3xl text-center mb-8 text-white font-bold">Türkçe Kelime</div>
+                
+                <div class="space-y-3" id="quiz-options">
+                    <!-- Options injected here -->
+                </div>
+                <div id="quiz-result" class="mt-6 text-center font-mono text-sm h-4"></div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        // --- GLOBAL STATE ---
+        let currentTab = 'gabor';
+        let wordsDB = [];
+        
+        // Emojis for vibe assignment based on word length
+        const vibeEmojis = ['✨', '⚡', '🧠', '👁️', '🌌', '🔮', '💡', '🧬', '🚀', '🔥'];
+
+        // --- INIT ---
+        window.onload = () => {
+            loadNotebook();
+            document.addEventListener('keydown', handleGlobalKeydown);
+        };
+
+        function switchTab(tab) {
+            currentTab = tab;
+            ['gabor', 'notebook', 'focus'].forEach(t => {
+                document.getElementById(`mod-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('tab-active');
+            });
+            document.getElementById(`mod-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).classList.add('tab-active');
+            document.getElementById(`mod-${tab}`).classList.add('flex');
+            
+            if(tab !== 'gabor') stopGabor();
+            if(tab === 'focus') resetFocusUI();
+        }
+
+        // --- MODULE 1: GABOR PATCH ---
+        const canvas = document.getElementById('gabor-canvas');
+        const ctx = canvas.getContext('2d');
+        let gaborActive = false;
+        let gaborTimeout;
+        let blinkInterval;
+        let currentGaborDir = 1; // 1: left(\), 2: right(/)
+        let showTime = 0;
+        let stats = { correct: 0, total: 0 };
+
+        function drawGaborPatch(angle) {
+            const width = canvas.width;
+            const height = canvas.height;
+            const imgData = ctx.createImageData(width, height);
+            const freq = 0.08;
+            const sigma = 25;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const theta = angle * Math.PI / 180;
+            
+            for(let y = 0; y < height; y++){
+                for(let x = 0; x < width; x++){
+                    const dx = x - centerX;
+                    const dy = y - centerY;
+                    const xp = dx * Math.cos(theta) + dy * Math.sin(theta);
+                    const yp = -dx * Math.sin(theta) + dy * Math.cos(theta);
+                    const envelope = Math.exp(-(xp*xp + yp*yp)/(2*sigma*sigma));
+                    const grating = Math.cos(2 * Math.PI * freq * xp);
+                    const val = Math.floor((grating * envelope * 0.5 + 0.5) * 255);
+                    const idx = (y * width + x) * 4;
+                    imgData.data[idx] = val;
+                    imgData.data[idx+1] = val;
+                    imgData.data[idx+2] = val;
+                    imgData.data[idx+3] = 255;
+                }
+            }
+            ctx.putImageData(imgData, 0, 0);
+        }
+
+        function clearCanvas() {
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function toggleGabor() {
+            const btn = document.getElementById('btn-gabor-start');
+            if(gaborActive) {
+                stopGabor();
+                btn.innerText = "Egzersizi Başlat";
+                btn.classList.replace('bg-red-500', 'bg-neon');
+            } else {
+                gaborActive = true;
+                stats = { correct: 0, total: 0 };
+                updateGaborScore();
+                btn.innerText = "Durdur";
+                btn.classList.replace('bg-neon', 'bg-red-500');
+                clearCanvas();
+                scheduleNextGabor();
+                
+                // Blink Reminder every 15s
+                blinkInterval = setInterval(() => {
+                    const alert = document.getElementById('blink-alert');
+                    alert.classList.remove('hidden');
+                    setTimeout(() => alert.classList.add('hidden'), 3000);
+                }, 15000);
+            }
+        }
+
+        function stopGabor() {
+            gaborActive = false;
+            clearTimeout(gaborTimeout);
+            clearInterval(blinkInterval);
+            clearCanvas();
+            document.getElementById('btn-gabor-start').innerText = "Egzersizi Başlat";
+            document.getElementById('btn-gabor-start').classList.replace('bg-red-500', 'bg-neon');
+        }
+
+        function scheduleNextGabor() {
+            if(!gaborActive) return;
+            const delay = Math.random() * 2000 + 1000; // 1 to 3 seconds
+            gaborTimeout = setTimeout(showGabor, delay);
+        }
+
+        function showGabor() {
+            currentGaborDir = Math.random() > 0.5 ? 1 : 2;
+            const angle = currentGaborDir === 1 ? -45 : 45; // 1: left tilt (\), 2: right tilt (/)
+            drawGaborPatch(angle);
+            showTime = performance.now();
+            
+            // Clear after 500ms
+            setTimeout(() => {
+                if(gaborActive) clearCanvas();
+            }, 500);
+        }
+
+        function handleGaborInput(key) {
+            if(!gaborActive || showTime === 0) return;
+            
+            const reactTime = Math.round(performance.now() - showTime);
+            document.getElementById('reaction-time').innerText = reactTime + " ms";
+            
+            stats.total++;
+            if((key === '1' && currentGaborDir === 1) || (key === '2' && currentGaborDir === 2)) {
+                stats.correct++;
+                document.getElementById('reaction-time').classList.add('text-green-400');
+                document.getElementById('reaction-time').classList.remove('text-neon', 'text-red-400');
+            } else {
+                document.getElementById('reaction-time').classList.add('text-red-400');
+                document.getElementById('reaction-time').classList.remove('text-neon', 'text-green-400');
+            }
+            
+            showTime = 0; // Wait for next
+            updateGaborScore();
+            clearCanvas();
+            scheduleNextGabor();
+        }
+
+        function updateGaborScore() {
+            document.getElementById('gabor-score').innerText = `${stats.correct} / ${stats.total}`;
+        }
+
+        // --- MODULE 2: NOTEBOOK ---
+        function saveNotebook() {
+            const text = document.getElementById('notebook-input').value;
+            const lines = text.split('\n');
+            lines.forEach(line => {
+                if(line.includes('-')) {
+                    const parts = line.split('-');
+                    const foreign = parts[0].trim();
+                    const turkish = parts.slice(1).join('-').trim();
+                    if(foreign && turkish) {
+                        wordsDB.push({ foreign, turkish, id: Date.now() + Math.random() });
+                    }
+                }
+            });
+            localStorage.setItem('vibevisio_db', JSON.stringify(wordsDB));
+            document.getElementById('notebook-input').value = '';
+            renderNotebook();
+        }
+
+        function loadNotebook() {
+            const saved = localStorage.getItem('vibevisio_db');
+            if(saved) wordsDB = JSON.parse(saved);
+            renderNotebook();
+        }
+
+        function renderNotebook() {
+            const list = document.getElementById('notebook-list');
+            list.innerHTML = '';
+            document.getElementById('word-count').innerText = wordsDB.length;
+            
+            wordsDB.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-gray-900 p-3 rounded border border-gray-800";
+                div.innerHTML = `
+                    <div class="text-sm font-mono truncate mr-2">
+                        <span class="text-gray-300">${item.foreign}</span>
+                        <span class="text-gray-600 mx-2">-</span>
+                        <span class="text-neon">${item.turkish}</span>
+                    </div>
+                    <button onclick="deleteWord('${item.id}')" class="text-gray-600 hover:text-red-500 text-lg">&times;</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function deleteWord(id) {
+            wordsDB = wordsDB.filter(w => w.id != id);
+            localStorage.setItem('vibevisio_db', JSON.stringify(wordsDB));
+            renderNotebook();
+        }
+
+        function clearNotebook() {
+            if(confirm("Tüm defteri silmek istediğine emin misin?")) {
+                wordsDB = [];
+                localStorage.removeItem('vibevisio_db');
+                renderNotebook();
+            }
+        }
+
+        // --- MODULE 3: ACTIVE FOCUS ---
+        let focusActive = false;
+        let focusIndex = 0;
+        let translationShown = false;
+        let focusList = [];
+
+        function resetFocusUI() {
+            focusActive = false;
+            document.getElementById('focus-setup').classList.remove('hidden');
+            document.getElementById('focus-player').classList.add('hidden');
+            document.getElementById('focus-player').classList.remove('flex');
+            document.getElementById('quiz-player').classList.add('hidden');
+        }
+
+        function startFocusMode() {
+            if(wordsDB.length === 0) {
+                alert("Defter boş! Lütfen önce kelime ekle.");
+                switchTab('notebook');
+                return;
+            }
+            
+            // Shuffle for focus
+            focusList = [...wordsDB].sort(() => 0.5 - Math.random());
+            focusIndex = 0;
+            focusActive = true;
+            translationShown = false;
+            
+            document.getElementById('focus-setup').classList.add('hidden');
+            document.getElementById('focus-player').classList.remove('hidden');
+            document.getElementById('focus-player').classList.add('flex');
+            
+            updateFocusScreen();
+        }
+
+        function updateFocusScreen() {
+            if(focusIndex >= focusList.length) {
+                startQuizMode();
+                return;
+            }
+            
+            const word = focusList[focusIndex];
+            const contrastVal = document.getElementById('contrast-slider').value;
+            const grayLvl = Math.floor((contrastVal / 100) * 255);
+            
+            const foreignEl = document.getElementById('focus-foreign');
+            foreignEl.innerText = word.foreign;
+            foreignEl.style.color = `rgb(${grayLvl}, ${grayLvl}, ${grayLvl})`;
+            
+            document.getElementById('focus-turkish').innerText = word.turkish;
+            document.getElementById('focus-turkish').style.opacity = '0';
+            
+            // Assign emoji based on string length to keep it consistent
+            const emojiIdx = word.foreign.length % vibeEmojis.length;
+            document.getElementById('focus-emoji').innerText = vibeEmojis[emojiIdx];
+            
+            document.getElementById('focus-progress').innerText = `${focusIndex + 1} / ${focusList.length}`;
+            translationShown = false;
+        }
+
+        function handleFocusSpace() {
+            if(!focusActive) return;
+            
+            if(!translationShown) {
+                document.getElementById('focus-turkish').style.opacity = '1';
+                translationShown = true;
+            } else {
+                focusIndex++;
+                updateFocusScreen();
+            }
+        }
+
+        // --- MODULE 4: MINI QUIZ ---
+        let quizActive = false;
+        let currentQuizWord = null;
+
+        function startQuizMode() {
+            focusActive = false;
+            if(wordsDB.length < 3) {
+                alert("Quiz modu için defterde en az 3 kelime olmalı. Tebrikler, odaklanma bitti!");
+                resetFocusUI();
+                return;
+            }
+            
+            quizActive = true;
+            document.getElementById('focus-player').classList.add('hidden');
+            document.getElementById('focus-player').classList.remove('flex');
+            document.getElementById('quiz-player').classList.remove('hidden');
+            
+            nextQuizQuestion();
+        }
+
+        function nextQuizQuestion() {
+            if(!quizActive) return;
+            document.getElementById('quiz-result').innerText = '';
+            
+            // Pick a random word
+            currentQuizWord = wordsDB[Math.floor(Math.random() * wordsDB.length)];
+            document.getElementById('quiz-question').innerText = currentQuizWord.turkish;
+            
+            // Get 2 other wrong options
+            let wrongOptions = wordsDB.filter(w => w.id !== currentQuizWord.id);
+            wrongOptions = wrongOptions.sort(() => 0.5 - Math.random()).slice(0, 2);
+            
+            let options = [currentQuizWord, ...wrongOptions].sort(() => 0.5 - Math.random());
+            
+            const optContainer = document.getElementById('quiz-options');
+            optContainer.innerHTML = '';
+            
+            options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full bg-gray-900 border border-gray-700 hover:border-neon text-gray-200 py-3 rounded text-lg transition-colors focus:outline-none focus:border-neon";
+                btn.innerText = opt.foreign;
+                btn.onclick = () => checkQuizAnswer(opt.id, btn);
+                optContainer.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(selectedId, btn) {
+            const resText = document.getElementById('quiz-result');
+            if(selectedId === currentQuizWord.id) {
+                btn.classList.add('bg-green-900/40', 'border-green-500', 'text-green-400');
+                resText.innerText = "Doğru! ✨";
+                resText.className = "mt-6 text-center font-mono text-sm h-4 text-green-400";
+                setTimeout(nextQuizQuestion, 1000);
+            } else {
+                btn.classList.add('bg-red-900/40', 'border-red-500', 'text-red-400');
+                resText.innerText = "Yanlış, tekrar dene.";
+                resText.className = "mt-6 text-center font-mono text-sm h-4 text-red-400";
+            }
+        }
+
+        // --- GLOBAL KEYBOARD HANDLER ---
+        function handleGlobalKeydown(e) {
+            if(currentTab === 'gabor' && gaborActive) {
+                if(e.key === '1' || e.key === '2') {
+                    handleGaborInput(e.key);
+                }
+            } else if(currentTab === 'focus') {
+                if(e.code === 'Space' && focusActive) {
+                    e.preventDefault(); // Prevent scrolling
+                    handleFocusSpace();
+                } else if(e.code === 'Space' && !focusActive && !quizActive) {
+                    e.preventDefault();
+                    startFocusMode();
+                }
+            }
+        }
+
+    </script>
+</body>
+</html>
