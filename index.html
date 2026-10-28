@@ -86,7 +86,6 @@
                     </div>
                 </div>
 
-                <!-- Touch Controls (Mobile) -->
                 <div class="flex gap-4 w-full mt-4 justify-center md:hidden">
                     <button onclick="handleGaborInput('1')" class="flex-1 bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white py-4 rounded-lg text-2xl active:bg-gray-600 transition-colors">⬅️</button>
                     <button onclick="handleGaborInput('2')" class="flex-1 bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white py-4 rounded-lg text-2xl active:bg-gray-600 transition-colors">➡️</button>
@@ -131,42 +130,70 @@
             </div>
         </section>
 
-        <!-- MODULE 3 & 4: Active Focus & Mini Quiz -->
+        <!-- MODULE 3 & 4: Active Focus, Reading & Mini Quiz -->
         <section id="mod-focus" class="absolute inset-0 hidden flex-col items-center justify-center">
             
-            <div id="focus-setup" class="cyber-border bg-panel p-8 rounded-lg text-center max-w-md w-full">
-                <h2 class="text-2xl font-mono text-neon mb-2">Active Focus Modu</h2>
-                <p class="text-sm text-gray-400 mb-2">Şu an seçili defter ile çalışılacak.</p>
-                <div id="focus-notebook-info" class="text-neon font-bold font-mono mb-6 bg-gray-900 py-2 rounded border border-gray-800"></div>
+            <!-- Focus Setup -->
+            <div id="focus-setup" class="cyber-border bg-panel p-6 rounded-lg text-center max-w-md w-full">
+                <h2 class="text-2xl font-mono text-neon mb-4">Active Focus Modu</h2>
                 
-                <div class="text-left mb-6">
-                    <label class="text-xs text-gray-500 mb-1 block">Metin Kontrastı (Zorluk)</label>
-                    <input type="range" id="contrast-slider" min="10" max="100" value="40" class="w-full">
+                <!-- Mode Toggle -->
+                <div class="flex border border-gray-700 rounded-lg overflow-hidden mb-6">
+                    <button id="btn-mode-notebook" onclick="setFocusSubMode('notebook')" class="flex-1 py-2 text-sm font-mono bg-gray-900 text-neon border-b-2 border-neon transition-colors">Defter Modu</button>
+                    <button id="btn-mode-text" onclick="setFocusSubMode('text')" class="flex-1 py-2 text-sm font-mono bg-gray-900 text-gray-500 border-b-2 border-transparent hover:text-gray-300 transition-colors">Serbest Okuma</button>
                 </div>
+
+                <!-- Notebook Section -->
+                <div id="focus-notebook-section" class="mb-6">
+                    <p class="text-sm text-gray-400 mb-2">Seçili defterin kelimeleriyle çalış (Bölüm sonu Quiz içerir).</p>
+                    <div id="focus-notebook-info" class="text-neon font-bold font-mono bg-gray-900 py-2 rounded border border-gray-800"></div>
+                </div>
+
+                <!-- Free Text Reading Section -->
+                <div id="focus-text-section" class="mb-6 hidden">
+                    <p class="text-sm text-gray-400 mb-2">Okuma kasını geliştirmek için serbest metin gir (Her satır ayrı gösterilir).</p>
+                    <textarea id="focus-text-input" class="w-full h-24 bg-gray-900 text-sm text-gray-200 p-3 rounded border border-gray-700 focus:border-neon outline-none resize-none font-sans" placeholder="Okumak istediğin cümleleri buraya yapıştır..."></textarea>
+                </div>
+                
+                <!-- Common Contrast Slider -->
+                <div class="text-left mb-6">
+                    <label class="text-xs text-gray-500 mb-1 block">Metin Kontrastı (Zorluk: Düşük kontrast = Yüksek Odak)</label>
+                    <input type="range" id="contrast-slider" min="5" max="100" value="30" class="w-full">
+                </div>
+                
                 <button onclick="startFocusMode()" class="w-full bg-neon text-black font-bold py-2 rounded hover:bg-cyan-300 transition-colors">Odaklanmaya Başla (Space)</button>
             </div>
 
+            <!-- Focus Player -->
             <div id="focus-player" class="hidden flex-col items-center justify-center w-full h-full">
                 <div id="focus-emoji" class="text-4xl mb-4 opacity-50">⚡</div>
-                <div id="focus-foreign" class="text-5xl md:text-7xl font-bold tracking-wider mb-6 transition-colors duration-300 text-center" style="color: #666;">Word</div>
+                
+                <!-- Dynamic text container for both words and long sentences -->
+                <div id="focus-content" class="font-bold tracking-wider mb-6 transition-colors duration-300 text-center max-w-3xl px-4" style="color: #666;">Word</div>
+                
                 <div id="focus-turkish" class="text-2xl md:text-3xl text-neon cyber-glow opacity-0 transition-opacity duration-300 h-10 text-center">Kelime</div>
                 
                 <div class="absolute bottom-10 text-gray-600 font-mono text-sm tracking-widest text-center">
-                    [ SPACE ] : Çeviri / İleri <br>
+                    [ SPACE ] : İleri <br>
                     <span id="focus-progress" class="text-xs">1 / 10</span>
                 </div>
             </div>
 
+            <!-- Quiz Modu -->
             <div id="quiz-player" class="hidden cyber-border bg-panel p-6 md:p-8 rounded-lg w-full max-w-lg">
                 <h2 class="text-xl font-mono text-neon mb-1 cyber-glow text-center">Mini Quiz</h2>
                 <p class="text-xs text-gray-500 text-center mb-8">Karşılığı seçerek hafızanı test et</p>
-                
                 <div id="quiz-question" class="text-2xl md:text-3xl text-center mb-8 text-white font-bold">Türkçe Kelime</div>
-                
-                <div class="space-y-3" id="quiz-options">
-                    <!-- Options injected -->
-                </div>
+                <div class="space-y-3" id="quiz-options"></div>
                 <div id="quiz-result" class="mt-6 text-center font-mono text-sm h-4"></div>
+            </div>
+            
+            <!-- Reading Completed Screen -->
+            <div id="reading-done-screen" class="hidden flex-col items-center justify-center text-center w-full h-full max-w-md">
+                <div class="text-6xl mb-6">🧘‍♀️</div>
+                <h2 class="text-3xl font-mono text-neon mb-2 cyber-glow">Odaklanma Tamamlandı</h2>
+                <p class="text-gray-400 mb-8">Göz kasların ve zihnin için harika bir antrenmandı.</p>
+                <button onclick="resetFocusUI()" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg border border-gray-600 transition-colors w-full">Ana Sayfaya Dön</button>
             </div>
 
         </section>
@@ -208,14 +235,14 @@
         const ctx = canvas.getContext('2d');
         let gaborActive = false;
         let gaborTimeout;
-        let currentGaborDir = 1; // 1: left(\), 2: right(/)
+        let currentGaborDir = 1; 
         let showTime = 0;
         let stats = { correct: 0, total: 0 };
         const maxGaborTrials = 30;
         let lastBlinkTime = 0;
 
         function clearCanvas() {
-            ctx.fillStyle = "#141414"; // Loş koyu gri arka plan
+            ctx.fillStyle = "#141414"; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
         clearCanvas();
@@ -230,9 +257,8 @@
             const centerY = height / 2;
             const theta = angle * Math.PI / 180;
             
-            // Kontrast hesaplama: Her 5 denemede bir azalır (1.0 -> 0.1)
             let contrastMultiplier = 1.0 - Math.floor(stats.total / 5) * 0.15;
-            contrastMultiplier = Math.max(0.1, contrastMultiplier); // min %10 kontrast
+            contrastMultiplier = Math.max(0.1, contrastMultiplier); 
 
             for(let y = 0; y < height; y++){
                 for(let x = 0; x < width; x++){
@@ -244,7 +270,6 @@
                     const envelope = Math.exp(-(xp*xp + yp*yp)/(2*sigma*sigma));
                     const grating = Math.cos(2 * Math.PI * freq * xp);
                     
-                    // Base background is 20 (dark). Amplitude scales with contrast.
                     const amplitude = 120 * contrastMultiplier; 
                     const val = Math.floor(20 + grating * envelope * amplitude);
                     
@@ -299,31 +324,22 @@
 
         function scheduleNextGabor() {
             if(!gaborActive) return;
-            
             const now = performance.now();
-            
-            // Eğer 15 saniye geçtiyse, Göz Kırp uyarısı ver ve gabor spawn'ı 2 saniye beklet
             if(now - lastBlinkTime > 15000) {
-                lastBlinkTime = now; // Süreyi sıfırla
-                
+                lastBlinkTime = now; 
                 const alert = document.getElementById('blink-alert');
                 alert.classList.remove('hidden');
                 alert.classList.add('blink-warning');
-                
-                // Animasyon bitince gizle
                 setTimeout(() => {
                     alert.classList.add('hidden');
                     alert.classList.remove('blink-warning');
-                    
-                    // Bekleme bittikten sonra normal sıradaki Gabor'u planla
                     if(gaborActive) {
                         const delay = Math.random() * 1500 + 1000;
                         gaborTimeout = setTimeout(showGabor, delay);
                     }
                 }, 2000);
             } else {
-                // Normal planlama
-                const delay = Math.random() * 1500 + 1000; // 1 to 2.5 seconds
+                const delay = Math.random() * 1500 + 1000;
                 gaborTimeout = setTimeout(showGabor, delay);
             }
         }
@@ -331,10 +347,9 @@
         function showGabor() {
             if(!gaborActive) return;
             currentGaborDir = Math.random() > 0.5 ? 1 : 2;
-            const angle = currentGaborDir === 1 ? -45 : 45; // 1: left(\), 2: right(/)
+            const angle = currentGaborDir === 1 ? -45 : 45;
             drawGaborPatch(angle);
             showTime = performance.now();
-            
             setTimeout(() => {
                 if(gaborActive) clearCanvas();
             }, 500);
@@ -343,7 +358,6 @@
         function handleGaborInput(key) {
             if(!gaborActive || showTime === 0) return;
             
-            // Klavye yön tuşlarını 1 ve 2'ye eşle
             let mappedKey = key;
             if(key === 'ArrowLeft') mappedKey = '1';
             if(key === 'ArrowRight') mappedKey = '2';
@@ -388,15 +402,8 @@
         // --- MODULE 2: NOTEBOOK & MULTI-DECK MANAGEMENT ---
         function loadNotebooksData() {
             const saved = localStorage.getItem('vibevisio_notebooks_v2');
-            if(saved) {
-                notebooks = JSON.parse(saved);
-            }
-            
-            // Eğer hiç defter yoksa default bir tane oluştur
-            if(notebooks.length === 0) {
-                notebooks.push({ id: 'default', name: 'Genel Defter', words: [] });
-            }
-            
+            if(saved) notebooks = JSON.parse(saved);
+            if(notebooks.length === 0) notebooks.push({ id: 'default', name: 'Genel Defter', words: [] });
             activeNotebookId = notebooks[0].id;
             renderNotebooksDropdown();
             renderNotebooksList();
@@ -426,11 +433,8 @@
         }
 
         function deleteCurrentNotebook() {
-            if(notebooks.length <= 1) {
-                alert("En az 1 defter kalmalı!");
-                return;
-            }
-            if(confirm("Seçili defteri ve içindeki tüm kelimeleri silmek istediğine emin misin?")) {
+            if(notebooks.length <= 1) return alert("En az 1 defter kalmalı!");
+            if(confirm("Seçili defteri silmek istediğine emin misin?")) {
                 notebooks = notebooks.filter(n => n.id !== activeNotebookId);
                 activeNotebookId = notebooks[0].id;
                 saveNotebooksData();
@@ -452,7 +456,6 @@
         function saveToNotebook() {
             const text = document.getElementById('notebook-input').value;
             const activeNotebook = notebooks.find(n => n.id === activeNotebookId);
-            
             const lines = text.split('\n');
             lines.forEach(line => {
                 if(line.includes('-')) {
@@ -472,7 +475,6 @@
             const activeNotebook = notebooks.find(n => n.id === activeNotebookId);
             const list = document.getElementById('notebook-list');
             list.innerHTML = '';
-            
             if(activeNotebook) {
                 document.getElementById('word-count').innerText = activeNotebook.words.length;
                 activeNotebook.words.forEach(item => {
@@ -497,11 +499,32 @@
             saveNotebooksData();
         }
 
-        // --- MODULE 3: ACTIVE FOCUS ---
+        // --- MODULE 3: ACTIVE FOCUS & FREE READING ---
         let focusActive = false;
         let focusIndex = 0;
         let translationShown = false;
         let focusList = [];
+        let currentFocusSubMode = 'notebook'; // 'notebook' or 'text'
+
+        function setFocusSubMode(mode) {
+            currentFocusSubMode = mode;
+            const btnNb = document.getElementById('btn-mode-notebook');
+            const btnTxt = document.getElementById('btn-mode-text');
+            const secNb = document.getElementById('focus-notebook-section');
+            const secTxt = document.getElementById('focus-text-section');
+
+            if(mode === 'notebook') {
+                secNb.classList.remove('hidden');
+                secTxt.classList.add('hidden');
+                btnNb.className = "flex-1 py-2 text-sm font-mono bg-gray-900 text-neon border-b-2 border-neon transition-colors";
+                btnTxt.className = "flex-1 py-2 text-sm font-mono bg-gray-900 text-gray-500 border-b-2 border-transparent hover:text-gray-300 transition-colors";
+            } else {
+                secTxt.classList.remove('hidden');
+                secNb.classList.add('hidden');
+                btnTxt.className = "flex-1 py-2 text-sm font-mono bg-gray-900 text-neon border-b-2 border-neon transition-colors";
+                btnNb.className = "flex-1 py-2 text-sm font-mono bg-gray-900 text-gray-500 border-b-2 border-transparent hover:text-gray-300 transition-colors";
+            }
+        }
 
         function resetFocusUI() {
             focusActive = false;
@@ -509,24 +532,35 @@
             document.getElementById('focus-player').classList.add('hidden');
             document.getElementById('focus-player').classList.remove('flex');
             document.getElementById('quiz-player').classList.add('hidden');
+            document.getElementById('reading-done-screen').classList.add('hidden');
+            document.getElementById('reading-done-screen').classList.remove('flex');
             
-            // Show which notebook is active in Focus Mode setup
             const activeNotebook = notebooks.find(n => n.id === activeNotebookId);
             document.getElementById('focus-notebook-info').innerText = activeNotebook ? `Seçili: ${activeNotebook.name}` : '';
         }
 
         function startFocusMode() {
-            const activeNotebook = notebooks.find(n => n.id === activeNotebookId);
-            if(!activeNotebook || activeNotebook.words.length === 0) {
-                alert("Seçili defter boş! Lütfen kelime ekle veya başka defter seç.");
-                switchTab('notebook');
-                return;
+            if(currentFocusSubMode === 'notebook') {
+                const activeNotebook = notebooks.find(n => n.id === activeNotebookId);
+                if(!activeNotebook || activeNotebook.words.length === 0) {
+                    alert("Seçili defter boş! Lütfen kelime ekle veya başka defter seç.");
+                    switchTab('notebook');
+                    return;
+                }
+                focusList = [...activeNotebook.words].sort(() => 0.5 - Math.random());
+            } else {
+                const rawText = document.getElementById('focus-text-input').value;
+                // Satırlara böl ve boş satırları at
+                focusList = rawText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+                if(focusList.length === 0) {
+                    alert("Lütfen okunacak bir metin girin!");
+                    return;
+                }
             }
             
-            focusList = [...activeNotebook.words].sort(() => 0.5 - Math.random());
             focusIndex = 0;
             focusActive = true;
-            translationShown = false;
+            translationShown = (currentFocusSubMode === 'text'); // Metin modunda çeviri aşamasını atlamak için true başlatıyoruz
             
             document.getElementById('focus-setup').classList.add('hidden');
             document.getElementById('focus-player').classList.remove('hidden');
@@ -537,32 +571,49 @@
 
         function updateFocusScreen() {
             if(focusIndex >= focusList.length) {
-                startQuizMode();
+                if(currentFocusSubMode === 'notebook') {
+                    startQuizMode();
+                } else {
+                    showReadingDoneScreen();
+                }
                 return;
             }
             
-            const word = focusList[focusIndex];
+            const item = focusList[focusIndex];
             const contrastVal = document.getElementById('contrast-slider').value;
             const grayLvl = Math.floor((contrastVal / 100) * 255);
             
-            const foreignEl = document.getElementById('focus-foreign');
-            foreignEl.innerText = word.foreign;
-            foreignEl.style.color = `rgb(${grayLvl}, ${grayLvl}, ${grayLvl})`;
+            const contentEl = document.getElementById('focus-content');
+            contentEl.style.color = `rgb(${grayLvl}, ${grayLvl}, ${grayLvl})`;
             
-            document.getElementById('focus-turkish').innerText = word.turkish;
-            document.getElementById('focus-turkish').style.opacity = '0';
-            
-            const emojiIdx = word.foreign.length % vibeEmojis.length;
-            document.getElementById('focus-emoji').innerText = vibeEmojis[emojiIdx];
+            if(currentFocusSubMode === 'notebook') {
+                contentEl.innerText = item.foreign;
+                contentEl.className = "text-5xl md:text-7xl font-bold tracking-wider mb-6 transition-colors duration-300 text-center max-w-3xl px-4";
+                
+                document.getElementById('focus-turkish').innerText = item.turkish;
+                document.getElementById('focus-turkish').style.opacity = '0';
+                document.getElementById('focus-turkish').classList.remove('hidden');
+                
+                const emojiIdx = item.foreign.length % vibeEmojis.length;
+                document.getElementById('focus-emoji').innerText = vibeEmojis[emojiIdx];
+                translationShown = false;
+            } else {
+                contentEl.innerText = item;
+                // Uzun metinler için daha küçük font ve daha geniş alan
+                contentEl.className = "text-2xl md:text-4xl font-semibold tracking-wide mb-6 transition-colors duration-300 text-center max-w-3xl px-4 leading-relaxed";
+                
+                document.getElementById('focus-turkish').classList.add('hidden');
+                document.getElementById('focus-emoji').innerText = '👁️';
+                translationShown = true; 
+            }
             
             document.getElementById('focus-progress').innerText = `${focusIndex + 1} / ${focusList.length}`;
-            translationShown = false;
         }
 
         function handleFocusSpace() {
             if(!focusActive) return;
             
-            if(!translationShown) {
+            if(currentFocusSubMode === 'notebook' && !translationShown) {
                 document.getElementById('focus-turkish').style.opacity = '1';
                 translationShown = true;
             } else {
@@ -571,7 +622,16 @@
             }
         }
 
-        // --- MODULE 4: MINI QUIZ ---
+        function showReadingDoneScreen() {
+            focusActive = false;
+            document.getElementById('focus-player').classList.add('hidden');
+            document.getElementById('focus-player').classList.remove('flex');
+            
+            document.getElementById('reading-done-screen').classList.remove('hidden');
+            document.getElementById('reading-done-screen').classList.add('flex');
+        }
+
+        // --- MODULE 4: MINI QUIZ (SADECE DEFTER MODUNDA) ---
         let quizActive = false;
         let currentQuizWord = null;
 
@@ -645,7 +705,7 @@
                 if(e.code === 'Space' && focusActive) {
                     e.preventDefault(); 
                     handleFocusSpace();
-                } else if(e.code === 'Space' && !focusActive && !quizActive) {
+                } else if(e.code === 'Space' && !focusActive && !quizActive && document.getElementById('reading-done-screen').classList.contains('hidden')) {
                     e.preventDefault();
                     startFocusMode();
                 }
