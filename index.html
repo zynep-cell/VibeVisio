@@ -41,25 +41,30 @@
         
         input[type=range] { accent-color: #0ff; }
         select option { background-color: #151520; color: #0ff; }
+        
+        /* Video iframe responsive container */
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     </style>
 </head>
 <body class="h-screen flex flex-col items-center p-4 md:p-6 selection:bg-neon selection:text-black">
 
     <!-- Header & Navigation -->
-    <header class="w-full max-w-4xl flex justify-between items-end mb-6 border-b border-gray-800 pb-4">
-        <div>
+    <header class="w-full max-w-5xl flex flex-col md:flex-row justify-between items-center md:items-end mb-6 border-b border-gray-800 pb-4 gap-4">
+        <div class="text-center md:text-left">
             <h1 class="text-3xl md:text-4xl font-mono font-bold text-neon cyber-glow tracking-tighter">VibeVisio</h1>
-            <p class="text-[10px] md:text-xs text-gray-400 mt-1 uppercase tracking-widest">Algısal Öğrenme & Göz Odak Sistemi</p>
+            <p class="text-[10px] md:text-xs text-gray-400 mt-1 uppercase tracking-widest">Algısal Öğrenme & Odak Sistemi</p>
         </div>
-        <nav class="flex gap-4 md:gap-6 font-mono text-xs md:text-sm">
-            <button onclick="switchTab('gabor')" id="tab-gabor" class="pb-1 hover:text-neon tab-active">Gabor Patch</button>
-            <button onclick="switchTab('notebook')" id="tab-notebook" class="pb-1 hover:text-neon">Defterler</button>
-            <button onclick="switchTab('focus')" id="tab-focus" class="pb-1 hover:text-neon">Active Focus</button>
+        <nav class="flex flex-wrap justify-center gap-3 md:gap-6 font-mono text-xs md:text-sm">
+            <button onclick="switchTab('gabor')" id="tab-gabor" class="pb-1 hover:text-neon tab-active transition-colors">Gabor Patch</button>
+            <button onclick="switchTab('notebook')" id="tab-notebook" class="pb-1 hover:text-neon transition-colors">Defterler</button>
+            <button onclick="switchTab('focus')" id="tab-focus" class="pb-1 hover:text-neon transition-colors">Active Focus</button>
+            <button onclick="switchTab('youtube')" id="tab-youtube" class="pb-1 hover:text-neon transition-colors text-red-400 border-b-2 border-transparent">Video Odası</button>
         </nav>
     </header>
 
     <!-- MAIN CONTAINER -->
-    <main class="w-full max-w-4xl flex-1 relative">
+    <main class="w-full max-w-5xl flex-1 relative">
         
         <!-- MODULE 1: Gabor Patch -->
         <section id="mod-gabor" class="absolute inset-0 flex flex-col items-center justify-center">
@@ -98,7 +103,7 @@
             </div>
         </section>
 
-        <!-- MODULE 2: Notebook (Defter Paneli) -->
+        <!-- MODULE 2: Notebook -->
         <section id="mod-notebook" class="absolute inset-0 hidden flex-col">
             <div class="flex flex-col md:flex-row gap-4 mb-6 items-end cyber-border bg-panel p-4 rounded-lg">
                 <div class="flex-1 w-full">
@@ -130,57 +135,56 @@
             </div>
         </section>
 
-        <!-- MODULE 3 & 4: Active Focus, Reading & Mini Quiz -->
-        <section id="mod-focus" class="absolute inset-0 hidden flex-col items-center justify-center">
+        <!-- MODULE 3: Active Focus & Reading -->
+        <section id="mod-focus" class="absolute inset-0 hidden flex-col items-center justify-center overflow-y-auto pb-10">
             
-            <!-- Focus Setup -->
-            <div id="focus-setup" class="cyber-border bg-panel p-6 rounded-lg text-center max-w-md w-full">
+            <div id="focus-setup" class="cyber-border bg-panel p-6 rounded-lg text-center max-w-md w-full my-auto">
                 <h2 class="text-2xl font-mono text-neon mb-4">Active Focus Modu</h2>
                 
-                <!-- Mode Toggle -->
                 <div class="flex border border-gray-700 rounded-lg overflow-hidden mb-6">
                     <button id="btn-mode-notebook" onclick="setFocusSubMode('notebook')" class="flex-1 py-2 text-sm font-mono bg-gray-900 text-neon border-b-2 border-neon transition-colors">Defter Modu</button>
                     <button id="btn-mode-text" onclick="setFocusSubMode('text')" class="flex-1 py-2 text-sm font-mono bg-gray-900 text-gray-500 border-b-2 border-transparent hover:text-gray-300 transition-colors">Serbest Okuma</button>
                 </div>
 
-                <!-- Notebook Section -->
                 <div id="focus-notebook-section" class="mb-6">
-                    <p class="text-sm text-gray-400 mb-2">Seçili defterin kelimeleriyle çalış (Bölüm sonu Quiz içerir).</p>
+                    <p class="text-sm text-gray-400 mb-2">Seçili defterin kelimeleriyle çalış (Quiz içerir).</p>
                     <div id="focus-notebook-info" class="text-neon font-bold font-mono bg-gray-900 py-2 rounded border border-gray-800"></div>
                 </div>
 
-                <!-- Free Text Reading Section -->
                 <div id="focus-text-section" class="mb-6 hidden">
-                    <p class="text-sm text-gray-400 mb-2">Okuma kasını geliştirmek için serbest metin gir (Her satır ayrı gösterilir).</p>
+                    <p class="text-sm text-gray-400 mb-2">Göz odak kasını zorlamak için uzun metinlerini buraya yapıştır.</p>
                     <textarea id="focus-text-input" class="w-full h-24 bg-gray-900 text-sm text-gray-200 p-3 rounded border border-gray-700 focus:border-neon outline-none resize-none font-sans" placeholder="Okumak istediğin cümleleri buraya yapıştır..."></textarea>
                 </div>
                 
-                <!-- Common Contrast Slider -->
                 <div class="text-left mb-6">
-                    <label class="text-xs text-gray-500 mb-1 block">Metin Kontrastı (Zorluk: Düşük kontrast = Yüksek Odak)</label>
+                    <label class="text-xs text-gray-500 mb-1 block">Metin Kontrastı (Zorluk)</label>
                     <input type="range" id="contrast-slider" min="5" max="100" value="30" class="w-full">
                 </div>
                 
-                <button onclick="startFocusMode()" class="w-full bg-neon text-black font-bold py-2 rounded hover:bg-cyan-300 transition-colors">Odaklanmaya Başla (Space)</button>
+                <button onclick="startFocusMode()" class="w-full bg-neon text-black font-bold py-2 rounded hover:bg-cyan-300 transition-colors">Odaklanmaya Başla</button>
             </div>
 
-            <!-- Focus Player -->
             <div id="focus-player" class="hidden flex-col items-center justify-center w-full h-full">
                 <div id="focus-emoji" class="text-4xl mb-4 opacity-50">⚡</div>
                 
-                <!-- Dynamic text container for both words and long sentences -->
-                <div id="focus-content" class="font-bold tracking-wider mb-6 transition-colors duration-300 text-center max-w-3xl px-4" style="color: #666;">Word</div>
-                
+                <div id="focus-content" class="font-bold tracking-wider mb-6 transition-colors duration-300 text-center max-w-4xl px-4" style="color: #666;">Word</div>
                 <div id="focus-turkish" class="text-2xl md:text-3xl text-neon cyber-glow opacity-0 transition-opacity duration-300 h-10 text-center">Kelime</div>
                 
-                <div class="absolute bottom-10 text-gray-600 font-mono text-sm tracking-widest text-center">
-                    [ SPACE ] : İleri <br>
-                    <span id="focus-progress" class="text-xs">1 / 10</span>
+                <div class="mt-8 flex flex-col items-center">
+                    <div class="text-gray-600 font-mono text-sm tracking-widest text-center mb-4 hidden md:block">
+                        [ SPACE ] : İleri / Çeviri <br>
+                        <span id="focus-progress-desktop" class="text-xs">1 / 10</span>
+                    </div>
+                    
+                    <!-- Mobile Tap Button -->
+                    <button onclick="handleFocusSpace()" class="md:hidden bg-gray-800 hover:bg-gray-700 border border-gray-600 px-8 py-4 rounded-xl text-neon font-mono shadow-lg active:scale-95 transition-transform text-lg flex items-center gap-2">
+                        Dokun (İleri) ➡️
+                    </button>
+                    <div class="text-gray-500 text-xs mt-2 md:hidden" id="focus-progress-mobile">1 / 10</div>
                 </div>
             </div>
 
-            <!-- Quiz Modu -->
-            <div id="quiz-player" class="hidden cyber-border bg-panel p-6 md:p-8 rounded-lg w-full max-w-lg">
+            <div id="quiz-player" class="hidden cyber-border bg-panel p-6 md:p-8 rounded-lg w-full max-w-lg my-auto">
                 <h2 class="text-xl font-mono text-neon mb-1 cyber-glow text-center">Mini Quiz</h2>
                 <p class="text-xs text-gray-500 text-center mb-8">Karşılığı seçerek hafızanı test et</p>
                 <div id="quiz-question" class="text-2xl md:text-3xl text-center mb-8 text-white font-bold">Türkçe Kelime</div>
@@ -188,14 +192,51 @@
                 <div id="quiz-result" class="mt-6 text-center font-mono text-sm h-4"></div>
             </div>
             
-            <!-- Reading Completed Screen -->
-            <div id="reading-done-screen" class="hidden flex-col items-center justify-center text-center w-full h-full max-w-md">
+            <div id="reading-done-screen" class="hidden flex-col items-center justify-center text-center w-full h-full max-w-md my-auto">
                 <div class="text-6xl mb-6">🧘‍♀️</div>
                 <h2 class="text-3xl font-mono text-neon mb-2 cyber-glow">Odaklanma Tamamlandı</h2>
-                <p class="text-gray-400 mb-8">Göz kasların ve zihnin için harika bir antrenmandı.</p>
-                <button onclick="resetFocusUI()" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg border border-gray-600 transition-colors w-full">Ana Sayfaya Dön</button>
+                <p class="text-gray-400 mb-8">Zihnin ve algın için harika bir antrenmandı.</p>
+                <button onclick="resetFocusUI()" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg border border-gray-600 transition-colors w-full">Ana Menüye Dön</button>
             </div>
+        </section>
 
+        <!-- MODULE 4: YouTube Video Room -->
+        <section id="mod-youtube" class="absolute inset-0 hidden flex-col">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
+                
+                <!-- Left Panel: List & Add -->
+                <div class="lg:col-span-4 flex flex-col gap-4">
+                    <div class="cyber-border bg-panel p-5 rounded-lg">
+                        <h2 class="text-lg font-mono text-red-400 mb-4">Yeni Video Ekle</h2>
+                        <input type="text" id="yt-title" placeholder="Video İsmi (örn: TEDx İngilizce)" class="w-full bg-gray-900 text-sm text-gray-200 p-3 rounded border border-gray-700 focus:border-red-400 outline-none font-sans mb-3">
+                        <input type="text" id="yt-url" placeholder="YouTube Linki" class="w-full bg-gray-900 text-sm text-gray-200 p-3 rounded border border-gray-700 focus:border-red-400 outline-none font-mono mb-3">
+                        <button onclick="saveYtLink()" class="w-full bg-gray-800 hover:bg-gray-700 text-red-400 border border-gray-700 py-2 rounded transition-colors font-mono">Listeye Kaydet</button>
+                    </div>
+
+                    <div class="cyber-border bg-panel p-5 rounded-lg flex-1 flex flex-col overflow-hidden min-h-[250px]">
+                        <h2 class="text-lg font-mono text-red-400 mb-4">Kayıtlı Videolar</h2>
+                        <div id="yt-list" class="flex-1 overflow-y-auto space-y-2 pr-2">
+                            <!-- YT links injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Player -->
+                <div class="lg:col-span-8 cyber-border bg-panel p-4 md:p-6 rounded-lg flex flex-col items-center justify-center">
+                    <div id="yt-placeholder" class="text-center text-gray-500">
+                        <div class="text-5xl mb-4">📺</div>
+                        <p>İzlemek için yandaki listeden bir video seç.</p>
+                    </div>
+                    
+                    <div id="yt-player-container" class="w-full hidden flex-col">
+                        <h3 id="current-yt-title" class="text-xl text-neon font-bold font-sans mb-4 cyber-glow">Video Başlığı</h3>
+                        <div class="video-container rounded-lg border border-gray-700 shadow-[0_0_15px_rgba(255,0,0,0.1)]">
+                            <iframe id="yt-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </section>
 
     </main>
@@ -204,28 +245,41 @@
         // --- GLOBAL STATE ---
         let currentTab = 'gabor';
         
-        // Notebooks Data Structure
         let notebooks = [];
         let activeNotebookId = null;
+        let ytLinks = [];
         
         const vibeEmojis = ['✨', '⚡', '🧠', '👁️', '🌌', '🔮', '💡', '🧬', '🚀', '🔥'];
 
         window.onload = () => {
             loadNotebooksData();
+            loadYtLinksData();
             document.addEventListener('keydown', handleGlobalKeydown);
         };
 
         function switchTab(tab) {
             currentTab = tab;
-            ['gabor', 'notebook', 'focus'].forEach(t => {
+            ['gabor', 'notebook', 'focus', 'youtube'].forEach(t => {
                 document.getElementById(`mod-${t}`).classList.add('hidden');
                 document.getElementById(`tab-${t}`).classList.remove('tab-active');
+                
+                // Style adjustments for active state
+                if(t === 'youtube') {
+                    document.getElementById(`tab-${t}`).classList.remove('border-red-400', 'text-red-400');
+                    document.getElementById(`tab-${t}`).classList.add('border-transparent');
+                }
             });
+            
             document.getElementById(`mod-${tab}`).classList.remove('hidden');
             document.getElementById(`tab-${tab}`).classList.add('tab-active');
             document.getElementById(`mod-${tab}`).classList.add('flex');
             
+            if(tab === 'youtube') {
+                document.getElementById('tab-youtube').classList.add('border-red-400', 'text-red-400');
+            }
+
             if(tab !== 'gabor') stopGabor();
+            if(tab !== 'youtube') stopYoutube();
             if(tab === 'focus') resetFocusUI();
             if(tab === 'notebook') renderNotebooksList();
         }
@@ -504,7 +558,7 @@
         let focusIndex = 0;
         let translationShown = false;
         let focusList = [];
-        let currentFocusSubMode = 'notebook'; // 'notebook' or 'text'
+        let currentFocusSubMode = 'notebook';
 
         function setFocusSubMode(mode) {
             currentFocusSubMode = mode;
@@ -550,17 +604,13 @@
                 focusList = [...activeNotebook.words].sort(() => 0.5 - Math.random());
             } else {
                 const rawText = document.getElementById('focus-text-input').value;
-                // Satırlara böl ve boş satırları at
                 focusList = rawText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
-                if(focusList.length === 0) {
-                    alert("Lütfen okunacak bir metin girin!");
-                    return;
-                }
+                if(focusList.length === 0) return alert("Lütfen okunacak bir metin girin!");
             }
             
             focusIndex = 0;
             focusActive = true;
-            translationShown = (currentFocusSubMode === 'text'); // Metin modunda çeviri aşamasını atlamak için true başlatıyoruz
+            translationShown = (currentFocusSubMode === 'text'); 
             
             document.getElementById('focus-setup').classList.add('hidden');
             document.getElementById('focus-player').classList.remove('hidden');
@@ -571,11 +621,8 @@
 
         function updateFocusScreen() {
             if(focusIndex >= focusList.length) {
-                if(currentFocusSubMode === 'notebook') {
-                    startQuizMode();
-                } else {
-                    showReadingDoneScreen();
-                }
+                if(currentFocusSubMode === 'notebook') startQuizMode();
+                else showReadingDoneScreen();
                 return;
             }
             
@@ -588,7 +635,7 @@
             
             if(currentFocusSubMode === 'notebook') {
                 contentEl.innerText = item.foreign;
-                contentEl.className = "text-5xl md:text-7xl font-bold tracking-wider mb-6 transition-colors duration-300 text-center max-w-3xl px-4";
+                contentEl.className = "text-5xl md:text-7xl font-bold tracking-wider mb-6 transition-colors duration-300 text-center max-w-4xl px-4";
                 
                 document.getElementById('focus-turkish').innerText = item.turkish;
                 document.getElementById('focus-turkish').style.opacity = '0';
@@ -599,15 +646,16 @@
                 translationShown = false;
             } else {
                 contentEl.innerText = item;
-                // Uzun metinler için daha küçük font ve daha geniş alan
-                contentEl.className = "text-2xl md:text-4xl font-semibold tracking-wide mb-6 transition-colors duration-300 text-center max-w-3xl px-4 leading-relaxed";
+                contentEl.className = "text-2xl md:text-4xl font-semibold tracking-wide mb-6 transition-colors duration-300 text-center max-w-4xl px-4 leading-relaxed";
                 
                 document.getElementById('focus-turkish').classList.add('hidden');
                 document.getElementById('focus-emoji').innerText = '👁️';
                 translationShown = true; 
             }
             
-            document.getElementById('focus-progress').innerText = `${focusIndex + 1} / ${focusList.length}`;
+            const progressTxt = `${focusIndex + 1} / ${focusList.length}`;
+            document.getElementById('focus-progress-desktop').innerText = progressTxt;
+            document.getElementById('focus-progress-mobile').innerText = progressTxt;
         }
 
         function handleFocusSpace() {
@@ -630,10 +678,6 @@
             document.getElementById('reading-done-screen').classList.remove('hidden');
             document.getElementById('reading-done-screen').classList.add('flex');
         }
-
-        // --- MODULE 4: MINI QUIZ (SADECE DEFTER MODUNDA) ---
-        let quizActive = false;
-        let currentQuizWord = null;
 
         function startQuizMode() {
             focusActive = false;
@@ -692,6 +736,86 @@
                 resText.innerText = "Yanlış, tekrar dene.";
                 resText.className = "mt-6 text-center font-mono text-sm h-4 text-red-400";
             }
+        }
+
+        // --- MODULE 4: YOUTUBE EMBED ---
+        function loadYtLinksData() {
+            const saved = localStorage.getItem('vibevisio_yt_links');
+            if(saved) ytLinks = JSON.parse(saved);
+            renderYtList();
+        }
+
+        function saveYtLinkDataToStorage() {
+            localStorage.setItem('vibevisio_yt_links', JSON.stringify(ytLinks));
+            renderYtList();
+        }
+
+        function extractYoutubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function saveYtLink() {
+            const titleInput = document.getElementById('yt-title');
+            const urlInput = document.getElementById('yt-url');
+            const title = titleInput.value.trim();
+            const url = urlInput.value.trim();
+
+            if(!title || !url) return alert("Lütfen isim ve link alanlarını doldurun.");
+
+            const videoId = extractYoutubeId(url);
+            if(!videoId) return alert("Geçersiz YouTube linki. Lütfen kontrol edin.");
+
+            ytLinks.push({ id: Date.now().toString(), title: title, videoId: videoId });
+            titleInput.value = '';
+            urlInput.value = '';
+            saveYtLinkDataToStorage();
+        }
+
+        function renderYtList() {
+            const list = document.getElementById('yt-list');
+            list.innerHTML = '';
+            
+            if(ytLinks.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 text-sm italic">Henüz video eklenmedi.</p>';
+                return;
+            }
+
+            ytLinks.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-gray-900 p-3 rounded border border-gray-800 hover:border-gray-600 transition-colors cursor-pointer";
+                div.innerHTML = `
+                    <div class="flex-1 text-sm font-sans truncate mr-2 text-gray-300" onclick="playYoutubeVideo('${item.videoId}', '${item.title.replace(/'/g, "\\'")}')">
+                        ▶ ${item.title}
+                    </div>
+                    <button onclick="deleteYtLink('${item.id}')" class="text-gray-600 hover:text-red-500 text-lg ml-2">&times;</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function deleteYtLink(id) {
+            ytLinks = ytLinks.filter(item => item.id !== id);
+            saveYtLinkDataToStorage();
+        }
+
+        function playYoutubeVideo(videoId, title) {
+            document.getElementById('yt-placeholder').classList.add('hidden');
+            const playerContainer = document.getElementById('yt-player-container');
+            const iframe = document.getElementById('yt-iframe');
+            const titleEl = document.getElementById('current-yt-title');
+
+            playerContainer.classList.remove('hidden');
+            playerContainer.classList.add('flex');
+            titleEl.innerText = title;
+            // Gömülü link oluşturuluyor
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+        }
+
+        function stopYoutube() {
+            const iframe = document.getElementById('yt-iframe');
+            if(iframe) iframe.src = ""; // Videoyu durdurur
         }
 
         // --- GLOBAL KEYBOARD HANDLER ---
